@@ -1,0 +1,9 @@
+To build the assembler and run it, type in the command:
+  python sas.py <input file> >loop.scram
+Our program is a SCRAM assembler which takes in a textual description and
+translates it into a 6-byte SCRAM object file.
+
+reads the filename from command line
+first reads in file into list
+reads all labels and assigns address
+puts labels in map
