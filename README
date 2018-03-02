@@ -7,5 +7,5 @@ eliminates blank lines. We encode into a map the instruction with its correspond
 code.
 After that, the program then loops through the list of instructions and maps the
 labels to addresses. We then loop through every item in the input list, convert
-to bytes, and output the list of byte string. The program then prings to standard
+to bytes, and output the list of byte string. The program then prints to standard
 out the byte list string.
