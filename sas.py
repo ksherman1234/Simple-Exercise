@@ -3,9 +3,13 @@ import sys
 
 def input_taker(input):
     """Read user input into a list and eliminate blank lines"""
-    with open(input) as f:
-        lines = f.readlines()
-    f.close()
+    try:
+        with open(input) as f:
+            lines = f.readlines()
+    except IOError as e:
+        print("I/O error({0}): {1}".format(e.errno, e.strerror))
+        exit(0)
+
     lines = [elem.strip() for elem in lines]
 
     for item in lines:
@@ -33,25 +37,37 @@ def assign_labels_address(input_instructions):
     return labels
 
 
-def dat_command_helper(command):
-    """Helper method for dealing with DAT instructions"""
-    commandInt = int(command)
-    if 0 <= commandInt and commandInt < 256:
-
-        bit = '{0:08b}'.format(commandInt)
-        return str(bit)
-    else:
-        print("Kevin, Simple Exercise, PLZ")
-
-
-def get_address_from_label(opp_and_addr, label_list):
+def get_address_from_label(elems_in_each_line, label_list):
     """Matches labels to their address and returns address"""
     for key in label_list:
         extra = "tHiS Is ExtRa"
-        opp_and_addr.append(extra)
-        if opp_and_addr[1] == key or opp_and_addr[2] == key:
+        elems_in_each_line.append(extra)
+        if elems_in_each_line[1] == key or elems_in_each_line[2] == key:
             return label_list[key]
     return
+
+def get_labeladdress_DAT(label, label_list):
+    for key in label_list:
+        if key == label:
+            return label_list[key]
+    return
+
+
+def dat_command_helper(elems_in_each_line, label_list):
+    """Helper method for dealing with DAT instructions"""
+    command = elems_in_each_line[2] if elems_in_each_line[1] == "DAT" else elems_in_each_line[1]
+    if command.isdigit():
+        commandInt = int(command)
+        if 0 <= commandInt and commandInt < 256:
+            bit = '{0:08b}'.format(commandInt)
+            return str(bit)
+        else:
+            raise ValueError("Too many instructions, can't be more than 16")
+            exit(0)
+    else:
+        address = get_labeladdress_DAT(command, label_list)
+        address_bit = '{0:08b}'.format(int(address))
+        return str(address_bit)
 
 
 def command_match_helper(encoding_list, label_list, opp_and_addr):
@@ -74,9 +90,9 @@ def byte_maker(input_list, label_list, encoding_list):
     for item in input_list:
         opp_and_addr = item.split()
 
-        if opp_and_addr[1] == "DAT":
+        if opp_and_addr[1] == "DAT" or opp_and_addr[0] == "DAT":
             #deals with Data
-            bit = dat_command_helper(opp_and_addr[2])
+            bit = dat_command_helper(opp_and_addr, encoding_list)
             bytelist.append(bit)
         else:
             bit = command_match_helper(encoding_list, label_list, opp_and_addr)
@@ -86,23 +102,33 @@ def byte_maker(input_list, label_list, encoding_list):
 
 def print_to_stdout(byte_list):
     """Conversts list of byte strings to bytecode and prints to stdout """
-    bytes =[]
-    for byte_string in byte_list:
-        #Encodes string
-        byte = byte_string.encode()
-        bytes.append(byte)
-    for byte in bytes:
+
+    #for byte in byte_list:
+        #converts to bytes and prints
+        #sys.stdout.buffer.write(bytes([int(byte,2)]))
+
+    #prints in string form
+    for byte in byte_list:
         print(byte)
 
 
 def main():
     """Main function. Takes in file name as command line argument and outputs bytes"""
-    if len(sys.argv) != 2:
-        print("Simple Exercise")
-    #need if statement for bad command line arguments
+    if len(sys.argv) > 2:
+        sys.argv[:2]
 
-    input = sys.argv[1]
+    try:
+    #Handles command line arguments errors
+        input = sys.argv[1]
+    except IndexError:
+        print("Not enough arguments")
+        exit(0)
+
     instruction_list = input_taker(input)
+    if len(instruction_list) > 16:
+        raise ValueError("Too many instructions, can't be more than 16")
+        exit(0)
+
     # scram instruction bit pattern
     encoding = {
         "HLT": "0000", "LDA": "0001", "LDI": "0010",
