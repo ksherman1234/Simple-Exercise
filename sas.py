@@ -18,8 +18,8 @@ def input_taker(input):
             lines.remove(item)
     lines = list(filter(None, lines))
     #removes empty lines
-    #for x in lines:
-    #    print(x)
+    for x in lines:
+        print(x)
     return lines
 
 
@@ -30,9 +30,14 @@ def assign_labels_address(input_instructions):
     for line in input_instructions:
         items = line.split()
         if items[0][-1:] == ':' and items[0][:1] != "#":
+            if input_instructions.index(line) + 1 == len(input_instructions) and len(items) == 1:
+                raise ValueError("Improper label location")
             items[0] = items[0][:-1]
             labels[items[0]] = address
-        address = address + 1
+        if len(items) == 1:
+            continue
+        else:
+            address = address + 1
     return labels
 
 
@@ -129,6 +134,17 @@ def address_opp_error_check(input):
             else:
                 continue
 
+def label_errors(input):
+    new_list = []
+    for line in input:
+        items = line.split()
+        if items[0][-1:] == ':':
+            new_line = line.split(":")
+            new_list.append(new_line[1])
+        else:
+            new_list.append(line)
+    return new_list
+
 
 def print_to_stdout(byte_list):
     """Conversts list of byte strings to bytecode and prints to stdout """
@@ -168,7 +184,8 @@ def main():
         "STA": "0011", "STI": "0100", "ADD": "0101",
         "SUB": "0110", "JMP": "0111", "JMZ": "1000",
     }
-    address_opp_error_check(clear_input_instructions)
+    final_input_instructions = label_errors(clear_input_instructions)
+    address_opp_error_check(final_input_instructions)
     byte_list = byte_maker(instruction_list, label_dict, encoding)
     print_to_stdout(byte_list)
 
