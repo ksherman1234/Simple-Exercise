@@ -2,8 +2,8 @@
 
 start:	LDA	count
 	ADD	one
-	STA	count
+	STA	poopy
 	JMP	start
 
-count:	DAT	0	# counter variable
+count:	DAT	poopy	# counter variable
 one:	DAT	1	# constant 1

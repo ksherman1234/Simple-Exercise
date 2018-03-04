@@ -1,5 +1,6 @@
 import sys
 
+
 def input_taker(input):
     """Read user input into a list and eliminate blank lines"""
     try:
@@ -12,14 +13,10 @@ def input_taker(input):
     lines = [elem.strip() for elem in lines]
 
     for item in lines:
-        #converts all items to a string
         item = str(item)
         if item[:1] == "#":
             lines.remove(item)
     lines = list(filter(None, lines))
-    #removes empty lines
-    for x in lines:
-        print(x)
     return lines
 
 
@@ -43,7 +40,7 @@ def assign_labels_address(input_instructions):
 
 def get_address_from_label(elems_in_each_line, label_list):
     """Matches labels to their address and returns address"""
-    command =elems_in_each_line[2] if (len(elems_in_each_line[1]) == 3 and elems_in_each_line[1].isupper()) else elems_in_each_line[1]
+    command = elems_in_each_line[2] if (len(elems_in_each_line[1]) == 3 and elems_in_each_line[1].isupper()) else elems_in_each_line[1]
     if command.isdigit():
         commandInt = int(command)
         if 0 <= commandInt and commandInt < 16:
@@ -60,6 +57,7 @@ def get_address_from_label(elems_in_each_line, label_list):
 
 
 def get_labeladdress_DAT(label, label_list):
+    """Gets label address if op is DAT"""
     for key in label_list:
         if key == label:
             return label_list[key]
@@ -79,6 +77,9 @@ def dat_command_helper(elems_in_each_line, label_list):
             exit(0)
     else:
         address = get_labeladdress_DAT(command, label_list)
+        if address is None:
+            raise ValueError("Invalid Input. Exiting program")
+            exit(0)
         address_bit = '{0:08b}'.format(int(address))
         return str(address_bit)
 
@@ -89,8 +90,9 @@ def command_match_helper(encoding_list, label_list, opp_and_addr):
         if opp_and_addr[1] == key or opp_and_addr[0] == key:
             bit = encoding_list[key]
             address = get_address_from_label(opp_and_addr, label_list)
-            if address == None:
-                continue
+            if address is None:
+                raise ValueError("Invalid Input. Exiting program")
+                exit(0)
             address_bit = '{0:04b}'.format(int(address))
             bit = bit + str(address_bit)
             return bit
@@ -103,14 +105,17 @@ def byte_maker(input_list, label_list, encoding_list):
     for item in input_list:
         opp_and_addr = item.split()
 
-        if opp_and_addr[1] == "DAT" or opp_and_addr[0] == "DAT":
-            #deals with Data
+        if opp_and_addr[0] == "DAT":
             bit = dat_command_helper(opp_and_addr, encoding_list)
+            bytelist.append(bit)
+        elif opp_and_addr[0] == "HLT":
+            bit = "00000000"
             bytelist.append(bit)
         else:
             bit = command_match_helper(encoding_list, label_list, opp_and_addr)
             bytelist.append(bit)
     return bytelist
+
 
 def clear_comments(input):
     """Removes all comments"""
@@ -120,7 +125,9 @@ def clear_comments(input):
         new_list.append(new_line[0])
     return new_list
 
+
 def address_opp_error_check(input):
+    """Checks that there is an address for each operation"""
     for line in input:
         items = line.split()
         if len(items) != 2:
@@ -134,7 +141,9 @@ def address_opp_error_check(input):
             else:
                 continue
 
+
 def label_errors(input):
+    """removes labels to avoid errors"""
     new_list = []
     for line in input:
         items = line.split()
@@ -150,12 +159,7 @@ def print_to_stdout(byte_list):
     """Conversts list of byte strings to bytecode and prints to stdout """
 
     for byte in byte_list:
-        #converts to bytes and prints
-        sys.stdout.buffer.write(bytes([int(byte,2)]))
-
-    #prints in string form
-    #for byte in byte_list:
-    #    print(byte)
+        sys.stdout.buffer.write(bytes([int(byte, 2)]))
 
 
 def main():
@@ -164,7 +168,6 @@ def main():
         sys.argv[:2]
 
     try:
-    #Handles command line arguments errors
         input = sys.argv[1]
     except IndexError:
         print("Not enough arguments")
@@ -186,7 +189,7 @@ def main():
     }
     final_input_instructions = label_errors(clear_input_instructions)
     address_opp_error_check(final_input_instructions)
-    byte_list = byte_maker(instruction_list, label_dict, encoding)
+    byte_list = byte_maker(final_input_instructions, label_dict, encoding)
     print_to_stdout(byte_list)
 
 
