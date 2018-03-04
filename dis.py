@@ -54,7 +54,7 @@ def disassemble(address):
 def main():
     """Read binary program from stdin and disassemble to stdout."""
     # using the internal buffer is a bad hack but avoids UTF-8 issues
-    binary = sys.stdin.read()
+    binary = sys.stdin.buffer.read()
 
     if len(binary) > SIZE:
         print("Program too long, truncated from {:d} to {:d} bytes.".format(
