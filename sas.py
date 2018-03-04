@@ -91,18 +91,30 @@ def clear_comments(input):
         new_list.append(new_line[0])
     return new_list
 
-#def address_label_error_check(input):
-#    for line in input
+def address_label_error_check(input):
+    for line in input:
+        items = line.split()
+        if len(items) != 2:
+            if len(items) == 1 and items[0] == "HLT":
+                continue
+            else:
+                raise ValueError("Each line must have an operation and an address")
+        else:
+            if items[0] == "HLT":
+                raise ValueError("You can not have HLT with an address")
+            else:
+                continue
+
 
 def print_to_stdout(byte_list):
     """Conversts list of byte strings to bytecode and prints to stdout """
-    for byte in byte_list:
+    #for byte in byte_list:
         #converts to bytes and prints
-        sys.stdout.buffer.write(bytes([int(byte,2)]))
+    #    sys.stdout.buffer.write(bytes([int(byte,2)]))
 
     #prints in string form
-    #for byte in byte_list:
-    #    print(byte)
+    for byte in byte_list:
+        print(byte)
 
 
 def main():
@@ -114,12 +126,13 @@ def main():
     input = sys.argv[1]
     instruction_list = input_taker(input)
     clear_input_instructions = clear_comments(instruction_list)
+    label_dict = assign_labels_address(instruction_list)
 
-    #for x in clear_input_instructions:
-    #    y = x.split()
-    #    print(len(y))
+    for x in clear_input_instructions:
+        y = x.split()
+        print(len(y))
 
-    if len(instruction_list) > 16:
+    if len(clear_input_instructions) > 16:
         raise ValueError("Too many instructions, can't be more than 16. Exiting program gracefully")
         exit(0)
     # scram instruction bit pattern
@@ -128,7 +141,11 @@ def main():
         "STA": "0011", "STI": "0100", "ADD": "0101",
         "SUB": "0110", "JMP": "0111", "JMZ": "1000",
     }
-    label_dict = assign_labels_address(clear_input_instructions)
+
+    #checks that addresses match with input
+    #address_label_error_check(clear_input_instructions)
+
+
     byte_list = byte_maker(instruction_list, label_dict, encoding)
     print_to_stdout(byte_list)
 
