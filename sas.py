@@ -39,12 +39,21 @@ def assign_labels_address(input_instructions):
 
 def get_address_from_label(elems_in_each_line, label_list):
     """Matches labels to their address and returns address"""
-    for key in label_list:
-        extra = "tHiS Is ExtRa"
-        elems_in_each_line.append(extra)
-        if elems_in_each_line[1] == key or elems_in_each_line[2] == key:
-            return label_list[key]
-    return
+    command =elems_in_each_line[2] if (len(elems_in_each_line[1]) == 3 and elems_in_each_line[1].isupper()) else elems_in_each_line[1]
+    if command.isdigit():
+        commandInt = int(command)
+        if 0 <= commandInt and commandInt < 16:
+            bit = '{0:04}'.format(commandInt)
+            return str(bit)
+        else:
+            raise ValueError("Address can't be larger than 16 bits")
+            exit(0)
+    else:
+        for key in label_list:
+            if command == key:
+                return label_list[key]
+        return
+
 
 def get_labeladdress_DAT(label, label_list):
     for key in label_list:
@@ -62,7 +71,7 @@ def dat_command_helper(elems_in_each_line, label_list):
             bit = '{0:08b}'.format(commandInt)
             return str(bit)
         else:
-            raise ValueError("Too many instructions, can't be more than 16")
+            raise ValueError("Too high a number, can't be more than 16")
             exit(0)
     else:
         address = get_labeladdress_DAT(command, label_list)
@@ -126,8 +135,9 @@ def main():
 
     instruction_list = input_taker(input)
     if len(instruction_list) > 16:
-        raise ValueError("Too many instructions, can't be more than 16")
+        raise ValueError("Too many instructions, can't be more than 16. Exiting program gracefully")
         exit(0)
+    #assert len(instruction_list) < 16
 
     # scram instruction bit pattern
     encoding = {

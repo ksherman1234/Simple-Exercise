@@ -1,12 +1,7 @@
-start:	LDA	count
-ADD	one
-STA	count
-JMP	start
-count:	DAT	0	# counter variable
-one:	DAT	1	# constant 1
-00010100
-01010101
-00110100
-01110000
-00000000
-00000001
+LDA	4
+ADD	5
+STA	4
+JMP	0
+DAT	0
+DAT	1
+[20][85][52][112][0][1]
