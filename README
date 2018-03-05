@@ -1,4 +1,6 @@
-To build the assembler and run it, type in the command:
+To build the assembler and run it, if your computer has python 2 and python 3, type in the command:
+  python3 sas.py <input file> >loop.scram
+If the computer only has python3, you can just type:
   python sas.py input file> >loop.scram
 Our program is a SCRAM assembler which takes in a textual description and
 translates it into a 6-byte SCRAM object file. The main function takes in a file
@@ -9,3 +11,6 @@ After that, the program then loops through the list of instructions and maps the
 labels to addresses. We then loop through every item in the input list, convert
 to bytes, and output the list of byte string. The program then prints to standard
 out the byte list string.
+  To handle errors, we raise exceptions and then prints to system error. Even though
+  it may look like it is crashing, it is not and it is our own exceptions being
+  thrown.
