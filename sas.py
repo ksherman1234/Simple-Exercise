@@ -70,8 +70,8 @@ def get_labeladdress_DAT(label, label_list):
 
 def dat_command_helper(elems_in_each_line, label_list):
     """Helper method for dealing with DAT instructions"""
-    command = elems_in_each_line[2] if elems_in_each_line[1] == "DAT"
-    else elems_in_each_line[1]
+    command = (elems_in_each_line[2] if elems_in_each_line[1] == "DAT"
+               else elems_in_each_line[1])
     if command.isdigit():
         commandInt = int(command)
         if 0 <= commandInt and commandInt < 256:
