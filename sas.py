@@ -27,7 +27,8 @@ def assign_labels_address(input_instructions):
     for line in input_instructions:
         items = line.split()
         if items[0][-1:] == ':' and items[0][:1] != "#":
-            if input_instructions.index(line) + 1 == len(input_instructions) and len(items) == 1:
+            if (input_instructions.index(line) + 1 ==
+                    len(input_instructions) and len(items) == 1):
                 raise ValueError("Improper label location")
             items[0] = items[0][:-1]
             labels[items[0]] = address
@@ -40,7 +41,10 @@ def assign_labels_address(input_instructions):
 
 def get_address_from_label(elems_in_each_line, label_list):
     """Matches labels to their address and returns address"""
-    command = elems_in_each_line[2] if (len(elems_in_each_line[1]) == 3 and elems_in_each_line[1].isupper()) else elems_in_each_line[1]
+    command = (
+        elems_in_each_line[2] if (len(elems_in_each_line[1]) == 3 and
+                                  elems_in_each_line[1].isupper())
+        else elems_in_each_line[1])
     if command.isdigit():
         commandInt = int(command)
         if 0 <= commandInt and commandInt < 16:
@@ -66,7 +70,8 @@ def get_labeladdress_DAT(label, label_list):
 
 def dat_command_helper(elems_in_each_line, label_list):
     """Helper method for dealing with DAT instructions"""
-    command = elems_in_each_line[2] if elems_in_each_line[1] == "DAT" else elems_in_each_line[1]
+    command = elems_in_each_line[2] if elems_in_each_line[1] == "DAT"
+    else elems_in_each_line[1]
     if command.isdigit():
         commandInt = int(command)
         if 0 <= commandInt and commandInt < 256:
@@ -134,7 +139,8 @@ def address_opp_error_check(input):
             if len(items) == 1 and items[0] == "HLT":
                 continue
             else:
-                raise ValueError("Each line must have an operation and an address")
+                raise ValueError(
+                    "Each line must have an operation and an address")
         else:
             if items[0] == "HLT":
                 raise ValueError("You can not have HLT with an address")
@@ -163,7 +169,7 @@ def print_to_stdout(byte_list):
 
 
 def main():
-    """Main function. Takes in file name as command line argument and outputs bytes"""
+    """Main function. Takes in file name and outputs bytes"""
     if len(sys.argv) > 2:
         sys.argv[:2]
 
@@ -175,7 +181,7 @@ def main():
 
     instruction_list = input_taker(input)
     if len(instruction_list) > 16:
-        raise ValueError("Too many instructions, can't be more than 16. Exiting program gracefully")
+        raise ValueError(("Too many instructions, can't be more than 16."))
         exit(0)
 
     clear_input_instructions = clear_comments(instruction_list)
